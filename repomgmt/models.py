@@ -41,13 +41,15 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+import novaclient.exceptions
+import novaclient.v1_1.client
+
 if settings.TESTING:
     import mock
     client = mock.Mock()
 else:
-    from novaclient.v1_1 import client
-
-from novaclient import exceptions as novaclient_exceptions
+    # FIXME(ben): update to at least V2 api
+    client = novaclient.v1_1.client
 
 from repomgmt import utils
 from repomgmt.exceptions import CommandFailed
@@ -765,19 +767,21 @@ class BuildNode(models.Model):
             self._run_cmd('sudo DEBIAN_FRONTEND=noninteractive '
                           'apt-get -y --force-yes install puppet')
             self._run_cmd('sudo wget -O puppet.pp %s/puppet/%s/' %
-                                          (settings.BASE_URL, build_record.id))
+                          (settings.BASE_URL, build_record.id))
             self._run_cmd('sudo -H puppet apply --verbose puppet.pp')
-            self._run_cmd(textwrap.dedent('''\n
-                          cat <<EOF > keygen.param
-                          Key-Type: 1
-                          Key-Length: 2048
-                          Subkey-Type: ELG-E
-                          Subkey-Length: 2048
-                          Name-Real: %s signing key
-                          Expire-Date: 0
-                          %%commit
-                          EOF''' % (self,)))
-            out = self._run_cmd('''gpg --gen-key --batch keygen.param''')
+            self._run_cmd(textwrap.dedent(
+                """\n
+                cat <<EOF > keygen.param
+                Key-Type: 1
+                Key-Length: 2048
+                Subkey-Type: ELG-E
+                Subkey-Length: 2048
+                Name-Real: %s signing key
+                Expire-Date: 0
+                %%commit
+                EOF""" % (self,)
+                ))
+            out = self._run_cmd('gpg --gen-key --batch keygen.param')
             for l in out.split('\n'):
                 if l.startswith('gpg: key '):
                     key_id = l.split(' ')[2]
@@ -792,7 +796,7 @@ class BuildNode(models.Model):
             build_record.series.repository.write_configuration()
         except Exception, e:
             logger.info('Preparing build node %s failed' % (self.name),
-                         exc_info=True)
+                        exc_info=True)
             self.delete()
 
     def build(self, build_record):
@@ -856,11 +860,11 @@ class BuildNode(models.Model):
     @classmethod
     def start_new(cls):
         cloud = random.choice(Cloud.objects.all())
-        logger.info('Picked cloud %s' % (cloud,))
+        logger.info('Picked cloud %s' % cloud)
         cl = cloud.client
         if cloud.keypair_set.count() < 1:
             logger.info('Cloud %s does not have a keypair yet. '
-                        'Creating' % (cloud,))
+                        'Creating' % cloud)
             name = cls.get_unique_keypair_name(cl)
             kp = cl.keypairs.create(name=name)
             keypair = KeyPair(cloud=cloud, name=name,
@@ -958,14 +962,14 @@ class BuildNode(models.Model):
                 logger.info('Deleting floating ip %s on cloud %s.' %
                             (floating_ip, self.cloud))
                 ref.delete()
-            except novaclient_exceptions.NotFound:
+            except novaclient.exceptions.NotFound:
                 logger.info('Node already gone, unable to release floating ip')
 
         logger.info('Deleting server %s on cloud %s.' %
                     (self, self.cloud))
         try:
             self.cloud_server.delete()
-        except novaclient_exceptions.NotFound:
+        except novaclient.exceptions.NotFound:
             logger.info('Node already gone, unable to delete it')
 
         if self.signing_key_id:
