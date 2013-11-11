@@ -13,7 +13,7 @@ to meet specific use cases that will be covered later.
 At its core, an APT repository management system takes source packages
 as input, generates binary packages and publishes them in an APT
 repository. Many packages these days are Python or Puppet code, so "binary
-packages" is perhaps a bit of a misnomer. See :ref:`model-packages` for more an explanation.
+packages" is perhaps a bit of a misnomer. See :ref:`modelpackages` for more an explanation.
 
 Everything makes it way into these APT repositories by first being
 uploaded as a source package. This goes for OpenStack components, Puppet

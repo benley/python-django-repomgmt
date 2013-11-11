@@ -27,7 +27,7 @@ Components
 
 Finally, APT repositories have a notion of components. This project does not actually implement them (the need has yet to arise), so I'll just mention that Ubuntu's components are "main", "universe", "restricted", and "multiverse".
 
-.. model-packages:
+.. _modelpackages:
 
 Packages
 --------
@@ -48,14 +48,14 @@ The top level of a repository has two directories:
 
 ``pool``
     this is where all the package files reside. Under ``pool``, you find one directory per component. In this project, we only have ``main``, so that's all you'll find. In the ``pool/main`` directory, you'll find a number of directories, named ``a`` through ``z`` as well as ``liba`` through ``libz``.
-   
+
     * Source packages with names starting with ``a`` go into ``pool/main/a``.
     * Source packages with names starting with ``b`` go into ``pool/main/b``.
     * etc.
     * Source packages with names starting with ``liba`` go into ``pool/main/liba``.
     * Source packages with names starting with ``libb`` go into ``pool/main/libb``,
     * etc.
-    
+
     Each source package has its own directory, so e.g. ``apt`` has a directory called ``pool/main/a/apt`` that holds ``apt``'s source packages as well as their binary package (regardless of the name of the binary packages).
 
 
@@ -69,7 +69,7 @@ The top level of a repository has two directories:
     * ``dists/precise-updates/``
     * ``dists/precise-proposed/``
     * etc.
-    
+
     Each of these directories are equivalent, they just list different files. If we for example look at ``dists/precise``, we find:
 
     ``dists/precise/Contents-amd64.gz``
@@ -107,7 +107,7 @@ The top level of a repository has two directories:
                 Metadata describing the context (component, architecture, etc.)
 
         ``dists/precise/main/binary-i386``
-             ditto for i386   
+             ditto for i386
 
         ``dists/precise/main/source``
              analogous to the binary-* directories, this holds the Source package index
@@ -144,5 +144,3 @@ Lines beginning with ``deb`` denote binary package sources, while lines beginnin
 When multiple components are specified, the cartesian product of ``pocket`` and ``component,component,...`` is used.
 
 From each source, it will fetch the package index. When asked to install a package, it will (unless instructed otherwise) choose the highest versioned package it can find across all its configured sources. For example, if both ``precise`` and ``quantal`` were configured, the package from ``quantal`` would most likely take precedence (as it would have a version higher than that found in Precise). Note that this comparison is done per-package. The fact that ``quantal`` sorts after ``precise`` is irrelevant.
-
-
