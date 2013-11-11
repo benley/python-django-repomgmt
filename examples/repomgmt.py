@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 #   Copyright 2013 Cisco Systems, Inc.
 #
@@ -182,7 +182,7 @@ def main(argv=sys.argv):
                         default=os.environ.get('REPOMGMT_PASSWORD'),
                         help='Your password on the repomgmt system')
     parser.add_argument('--url', dest='url', action='store',
-                        default='http://apt.ctocllab.cisco.com/api/v1/',
+                        default='http://localhost:8000/api/v1/',
                         help='The URL of the repomgmt system')
     subparsers = parser.add_subparsers(title='subcommands',
                                        description='valid subcommands')

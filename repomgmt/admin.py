@@ -18,7 +18,7 @@
 from django.contrib import admin
 from repomgmt.models import Architecture, Repository, BuildNode
 from repomgmt.models import Cloud, KeyPair, Series, ChrootTarball
-from repomgmt.models import UploaderKey
+from repomgmt.models import UploaderKey, UbuntuSeries
 
 admin.site.register(Architecture)
 admin.site.register(Repository)
@@ -28,3 +28,4 @@ admin.site.register(KeyPair)
 admin.site.register(Series)
 admin.site.register(ChrootTarball)
 admin.site.register(UploaderKey)
+admin.site.register(UbuntuSeries)

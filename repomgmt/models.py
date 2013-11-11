@@ -361,6 +361,9 @@ class UbuntuSeries(models.Model):
     def __unicode__(self):
         return 'Ubuntu %s' % (self.name.capitalize())
 
+    class Meta:
+        verbose_name_plural = "Ubuntu series"
+
 
 class ChrootTarball(models.Model):
     NOT_AVAILABLE = 1
@@ -684,7 +687,7 @@ class KeyPair(models.Model):
         return '%s@%s' % (self.name, self.cloud)
 
     class Meta:
-        verbose_name_plural = "series"
+        verbose_name_plural = "keypairs"
         unique_together = ('cloud', 'name')
 
 

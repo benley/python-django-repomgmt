@@ -18,7 +18,7 @@
 import logging
 import os
 
-from debian_bundle.deb822 import Changes, Dsc
+from debian.deb822 import Changes, Dsc
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
