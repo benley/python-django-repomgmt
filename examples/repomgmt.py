@@ -31,6 +31,7 @@ def list_dict(objs, field_headers, field_names):
         pt.add_row([obj.get(f, '') for f in field_names])
     print pt
 
+
 def list_objs(objs, field_headers, field_names):
     pt = prettytable.PrettyTable(field_headers, caching=False)
     for f in field_headers:
@@ -47,7 +48,8 @@ repository_cache = {}
 
 def get_package_source(client, uri):
     if not uri in package_source_cache:
-        package_source_cache[uri] = client.packagesource.objects.get(id=uri.split('/')[-2])
+        package_source_cache[uri] = client.packagesource.objects.get(
+            id=uri.split('/')[-2])
     return package_source_cache[uri]
 
 
@@ -59,7 +61,8 @@ def get_series(client, uri):
 
 def get_repository(client, uri):
     if not uri in repository_cache:
-        repository_cache[uri] = client.repository.objects.get(id=uri.split('/')[-2])
+        repository_cache[uri] = client.repository.objects.get(
+            id=uri.split('/')[-2])
     return repository_cache[uri]
 
 
@@ -76,7 +79,8 @@ def series_str(series):
 
 
 def get_client(args, strict=True):
-    return Client(args.url, auth=(args.username, args.password), strict_field=strict)
+    return Client(args.url, auth=(args.username, args.password),
+                  strict_field=strict)
 
 
 def repository_list(args):
@@ -84,15 +88,17 @@ def repository_list(args):
     obj_type = client.repository
     list_objs(obj_type.objects.all(), ['Name'], ['name'])
 
+
 def series_list(args):
     client = get_client(args)
     obj_type = client.series
     objs = list(obj_type.objects.filter(repository__name=args.repository))
-    objs.sort(key=lambda x:'%s-%s' % (x.repository, x.name))
+    objs.sort(key=lambda x: '%s-%s' % (x.repository, x.name))
     objs = [{'Repository': obj.repository.name,
-                 'Name': obj.name} for obj in objs]
+             'Name': obj.name} for obj in objs]
 
     list_dict(objs, ['Repository', 'Name'], ['Repository', 'Name'])
+
 
 def packagesource_list(args):
     client = get_client(args)
@@ -135,7 +141,9 @@ def subscription_replace(args):
     new_source = client.packagesource.objects.get(id=args.source)
     obj.model.package_source = new_source.resource_uri
     obj.save()
-    print 'Replaced %r with %r in %r' % (orig_source.name, new_source.name, series_str(subscription_to_series(client, obj)))
+    print 'Replaced %r with %r in %r' % (
+        orig_source.name, new_source.name,
+        series_str(subscription_to_series(client, obj)))
 
 
 def subscription_delete(args):
@@ -148,9 +156,11 @@ def subscription_delete(args):
 def subscription_create(args):
     client = get_client(args)
     obj_type = client.subscription
-    series = client.series.objects.get(name=args.series, repository__name=args.repository)
+    series = client.series.objects.get(name=args.series,
+                                       repository__name=args.repository)
     source = client.packagesource.objects.get(id=args.source)
-    subscription = obj_type(counter=1, destination_series=series, package_source=source)
+    subscription = obj_type(counter=1, destination_series=series,
+                            package_source=source)
     subscription.save()
     return True
 
@@ -165,16 +175,19 @@ def subscription_list(args):
         kwargs['destination_series__name'] = args.series
 
     objs = list(obj_type.objects.filter(**kwargs))
-    objs = [{'Id': obj.id,
-             'Package Source': subscription_to_package_source(client, obj).name,
-             'Destination Series': series_str(subscription_to_series(client, obj)),
-             'Counter': obj.counter} for obj in objs]
+    objs = [
+        {'Id': obj.id,
+         'Package Source': subscription_to_package_source(client, obj).name,
+         'Destination Series': series_str(subscription_to_series(client, obj)),
+         'Counter': obj.counter} for obj in objs
+        ]
     list_dict(objs, ['Id', 'Package Source', 'Destination Series', 'Counter'],
                     ['Id', 'Package Source', 'Destination Series', 'Counter'])
 
 
 def main(argv=sys.argv):
-    parser = argparse.ArgumentParser(description='Interact with repomgmt system')
+    parser = argparse.ArgumentParser(
+        description='Interact with repomgmt system')
     parser.add_argument('--username', action='store',
                         default=os.environ.get('REPOMGMT_USERNAME'),
                         help='Your username on the repomgmt system')
@@ -187,49 +200,82 @@ def main(argv=sys.argv):
     subparsers = parser.add_subparsers(title='subcommands',
                                        description='valid subcommands')
 
-    repo_list_parser = subparsers.add_parser('repository-list', description='List repositories')
+    repo_list_parser = subparsers.add_parser('repository-list',
+                                             description='List repositories')
     repo_list_parser.set_defaults(func=repository_list)
 
-    series_list_parser = subparsers.add_parser('series-list', description='List series')
-    series_list_parser.add_argument('repository', nargs='?', help='Only show series belonging to this repository')
+    series_list_parser = subparsers.add_parser('series-list',
+                                               description='List series')
+    series_list_parser.add_argument(
+        'repository', nargs='?',
+        help='Only show series belonging to this repository')
     series_list_parser.set_defaults(func=series_list)
 
-    package_source_list_parser = subparsers.add_parser('packagesource-list', description='List package sources')
+    package_source_list_parser = subparsers.add_parser(
+        'packagesource-list', description='List package sources')
     package_source_list_parser.set_defaults(func=packagesource_list)
 
-    package_source_create_parser = subparsers.add_parser('packagesource-create', description='Create package source')
-    package_source_create_parser.add_argument('name', help='Name of this package source')
-    package_source_create_parser.add_argument('code_url', help='URL to code (If a git url, you must include a branch name by appending \'#branchname\')')
-    package_source_create_parser.add_argument('packaging_url', help='URL for the packaging code (same syntx as code_url)')
-    package_source_create_parser.add_argument('flavor', help='Flavor (options are "Puppet", "OpenStack", and "Native")')
+    package_source_create_parser = subparsers.add_parser(
+        'packagesource-create', description='Create package source')
+    package_source_create_parser.add_argument(
+        'name', help='Name of this package source')
+    package_source_create_parser.add_argument(
+        'code_url',
+        help=("URL to code (If a git url, you must include a branch name "
+              "by appending '#branchname')"))
+    package_source_create_parser.add_argument(
+        'packaging_url',
+        help='URL for the packaging code (same syntx as code_url)')
+    package_source_create_parser.add_argument(
+        'flavor',
+        help='Flavor (options are "Puppet", "OpenStack", and "Native")')
     package_source_create_parser.set_defaults(func=packagesource_create)
 
-    package_source_delete_parser = subparsers.add_parser('packagesource-delete', description='Delete package source')
-    package_source_delete_parser.add_argument('id', help='id of the package source to be deleted')
+    package_source_delete_parser = subparsers.add_parser(
+        'packagesource-delete', description='Delete package source')
+    package_source_delete_parser.add_argument(
+        'id', help='id of the package source to be deleted')
     package_source_delete_parser.set_defaults(func=packagesource_delete)
 
-    package_source_rebuild_parser = subparsers.add_parser('packagesource-rebuild', description='Trigger rebuild of package source')
-    package_source_rebuild_parser.add_argument('id', help='id of the package source to trigger a rebuild of')
+    package_source_rebuild_parser = subparsers.add_parser(
+        'packagesource-rebuild',
+        description='Trigger rebuild of package source')
+    package_source_rebuild_parser.add_argument(
+        'id',
+        help='id of the package source to trigger a rebuild of')
     package_source_rebuild_parser.set_defaults(func=packagesource_rebuild)
 
-    subscription_create_parser = subparsers.add_parser('subscription-create', description='Create subscription')
-    subscription_create_parser.add_argument('repository', help='Repository name')
+    subscription_create_parser = subparsers.add_parser(
+        'subscription-create',
+        description='Create subscription')
+    subscription_create_parser.add_argument(
+        'repository', help='Repository name')
     subscription_create_parser.add_argument('series', help='Series name')
     subscription_create_parser.add_argument('source', help='Package source ID')
     subscription_create_parser.set_defaults(func=subscription_create)
 
-    subscription_delete_parser = subparsers.add_parser('subscription-delete', description='Delete subscription')
-    subscription_delete_parser.add_argument('id', help='id of the subscription to delete')
+    subscription_delete_parser = subparsers.add_parser(
+        'subscription-delete', description='Delete subscription')
+    subscription_delete_parser.add_argument(
+        'id', help='id of the subscription to delete')
     subscription_delete_parser.set_defaults(func=subscription_delete)
 
-    subscription_list_parser = subparsers.add_parser('subscription-list', description='List subscriptions')
-    subscription_list_parser.add_argument('repository', nargs='?', help='If given, only show subscriptions in this repository')
-    subscription_list_parser.add_argument('series', nargs='?', help='If given, only show subscriptions in this series')
+    subscription_list_parser = subparsers.add_parser(
+        'subscription-list', description='List subscriptions')
+    subscription_list_parser.add_argument(
+        'repository', nargs='?',
+        help='If given, only show subscriptions in this repository')
+    subscription_list_parser.add_argument(
+        'series', nargs='?',
+        help='If given, only show subscriptions in this series')
     subscription_list_parser.set_defaults(func=subscription_list)
 
-    subscription_replace_parser = subparsers.add_parser('subscription-replace', description='Replace subscription')
-    subscription_replace_parser.add_argument('subscription', help='id of the subscription')
-    subscription_replace_parser.add_argument('source', help='id of the new package source')
+    subscription_replace_parser = subparsers.add_parser(
+        'subscription-replace', description='Replace subscription')
+    subscription_replace_parser.add_argument(
+        'subscription', help='id of the subscription')
+    subscription_replace_parser.add_argument(
+        'source', help='id of the new package source')
     subscription_replace_parser.set_defaults(func=subscription_replace)
 
     args = parser.parse_args()
@@ -239,4 +285,3 @@ def main(argv=sys.argv):
 
 if __name__ == '__main__':
     sys.exit([1, 0][main()])
-

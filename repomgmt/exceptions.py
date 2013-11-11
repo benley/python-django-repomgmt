@@ -20,6 +20,7 @@
 class NoPendingBuilds(Exception):
     pass
 
+
 class CommandFailed(Exception):
     def __init__(self, msg, cmd, returncode, stdout, stderr):
         self.cmd = cmd

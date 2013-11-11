@@ -181,6 +181,7 @@ class Repository(models.Model):
             return True
         return False
 
+
 class UploaderKey(models.Model):
     key_id = models.CharField(max_length=200, primary_key=True)
     uploader = models.ForeignKey(User)
@@ -1079,6 +1080,7 @@ class TarballCacheEntry(models.Model):
 
         shutil.copy(filename, self.filepath())
 
+
 class PackageSourceBuildProblem(models.Model):
     name = models.CharField(max_length=200)
     code_url = models.CharField(max_length=200)
@@ -1526,4 +1528,3 @@ class Subscription(models.Model):
 
     def can_modify(self, user):
         return self.target_series.can_modify(user)
-
