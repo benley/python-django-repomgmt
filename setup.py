@@ -13,17 +13,24 @@ setup(
     keywords='django apt repository buildd',
     install_requires=[
         'django',
+        'django-celery',
+        'django-registration',
+        'django-tastypie',
+        'prettytable',
+        'python-debian',
+        'python-novaclient',
+        'tastypie-queryset-client'
     ],
     test_suite='tests.main',
     classifiers=[
-      'Development Status :: 2 - Pre-Alpha',
-      'Environment :: Web Environment',
-      'Framework :: Django',
-      'Intended Audience :: Developers',
-      'License :: OSI Approved :: Apache Software License',
-      'Operating System :: POSIX :: Linux',
-      'Programming Language :: Python',
-      'Topic :: Software Development',
-      'Topic :: System :: Archiving :: Packaging'
-     ]
+        'Development Status :: 2 - Pre-Alpha',
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python',
+        'Topic :: Software Development',
+        'Topic :: System :: Archiving :: Packaging'
+    ]
 )
