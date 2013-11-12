@@ -1,7 +1,7 @@
 # Django settings for www project.
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG 
+TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('<%= admin_name %>', '<%= admin_email %>'),
@@ -68,14 +68,14 @@ STATIC_ROOT = '/home/<%= user %>/www/static'
 STATIC_URL = '/static/'
 
 # Additional locations of static files
-STATICFILES_DIRS = (   
+STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
 
 # List of finder classes that know how to find static files in
-# various locations.   
+# various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -86,13 +86,13 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '<%= secret_key %>'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (   
+TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
 
-MIDDLEWARE_CLASSES = ( 
+MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -122,9 +122,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
     'djcelery',
     'registration',
     'tastypie',
@@ -182,7 +182,7 @@ TESTING=False
 
 LOGIN_REDIRECT_URL = '/users/me/'
 
- 
+
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
                            'repomgmt.auth.MyAuthBackend')
 
@@ -198,7 +198,7 @@ floating_ip = "<%= ftp_ip %>"
 fixed_ip = floating_ip
 <% end %>
 
- 
+
 FTP_IP = fixed_ip
 FTP_BASE_PATH = "/incoming"
 BASE_URL = "http://%s:8000" % (floating_ip,)
